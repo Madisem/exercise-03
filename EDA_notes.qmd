@@ -179,7 +179,7 @@ Add a variable, Binomial to the data frame d, which is a concatenation of the Ge
 
 ```{r}
 df %>% mutate(df, Binomial = paste(Genus, Species, sep = " ")) %>%
-select(Binomial,Family,Brain_Size_Species_Mean,Body_mass_male_mean) %>% group_by(Family) %>% summarize(n_cases = n(), AvB = mean(df$Brain_Size_Species_Mean, na.rm = TRUE), AvM = mean(df$Body_mass_male_mean, na.rm = TRUE)) %>% arrange(AvB)
+select(Binomial,Family,Brain_Size_Species_Mean,Body_mass_male_mean) %>% group_by(Family) %>% summarize(n_cases = n(), AvB = mean(Brain_Size_Species_Mean, na.rm = TRUE), AvM = mean(Body_mass_male_mean, na.rm = TRUE)) %>% arrange(AvB)
 ```
 
 I dont know why my code not counting the average mean, I mean their everage is same for all the group! It keep calculating the overal mean, not per Family. That one I could not fix.

@@ -386,25 +386,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Add a variable, Binomial to the data frame d, which is a concatenation of the Genus and Species variables… Trim the data frame to only include the variables Binomial, Family, Brain_size_species_mean, and Body_mass_male_mean… Group these variables by Family… Calculate the average value for Brain_size_species_mean and Body_mass_male_mean per Family (remember, you may need to specify na.rm = TRUE)… And arrange by increasing average brain size</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(df, <span class="at">Binomial =</span> <span class="fu">paste</span>(Genus, Species, <span class="at">sep =</span> <span class="st">" "</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(Binomial,Family,Brain_Size_Species_Mean,Body_mass_male_mean) <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(Family) <span class="sc">%&gt;%</span> <span class="fu">summarize</span>(<span class="at">n_cases =</span> <span class="fu">n</span>(), <span class="at">AvB =</span> <span class="fu">mean</span>(df<span class="sc">$</span>Brain_Size_Species_Mean, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">AvM =</span> <span class="fu">mean</span>(df<span class="sc">$</span>Body_mass_male_mean, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(AvB)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(Binomial,Family,Brain_Size_Species_Mean,Body_mass_male_mean) <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(Family) <span class="sc">%&gt;%</span> <span class="fu">summarize</span>(<span class="at">n_cases =</span> <span class="fu">n</span>(), <span class="at">AvB =</span> <span class="fu">mean</span>(Brain_Size_Species_Mean, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">AvM =</span> <span class="fu">mean</span>(Body_mass_male_mean, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(AvB)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 14 × 4
-   Family          n_cases   AvB   AvM
-   &lt;chr&gt;             &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;
- 1 Atelidae             12  68.1 8112.
- 2 Cebidae              37  68.1 8112.
- 3 Cercopithecidae      79  68.1 8112.
- 4 Cheirogalidae         7  68.1 8112.
- 5 Daubentonidae         1  68.1 8112.
- 6 Galagidae             7  68.1 8112.
- 7 Hominidae             6  68.1 8112.
- 8 Hylobatidae          11  68.1 8112.
- 9 Indriidae             9  68.1 8112.
-10 Lemuridae            17  68.1 8112.
-11 Lepilemuridae         6  68.1 8112.
-12 Lorisidae             8  68.1 8112.
-13 Pitheciidae          10  68.1 8112.
-14 Tarsiidae             3  68.1 8112.</code></pre>
+   Family          n_cases    AvB    AvM
+   &lt;chr&gt;             &lt;int&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+ 1 Tarsiidae             3   3.26   131 
+ 2 Cheirogalidae         7   4.04   193.
+ 3 Galagidae             7   5.96   395.
+ 4 Lepilemuridae         6   7.27   792 
+ 5 Lorisidae             8   8.67   512.
+ 6 Lemuridae            17  23.1   2077.
+ 7 Cebidae              37  23.9   1012.
+ 8 Indriidae             9  27.3   3638.
+ 9 Daubentonidae         1  44.8   2620 
+10 Pitheciidae          10  56.3   1955.
+11 Atelidae             12  80.6   7895.
+12 Cercopithecidae      79  85.4   9543.
+13 Hylobatidae          11 101.    6926.
+14 Hominidae             6 410.   98681.</code></pre>
 </div>
 </div>
 <p>I dont know why my code not counting the average mean, I mean their everage is same for all the group! It keep calculating the overal mean, not per Family. That one I could not fix.</p>
