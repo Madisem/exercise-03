@@ -1,0 +1,229 @@
+---
+title: "EDA-challenge"
+author: "Madina"
+format: html
+editor: visual
+---
+
+## Exercise 03
+
+Load and explore the “data-wrangling.csv” dataset!
+
+```{r}
+#| warning: false
+library(tidyverse)
+f<-"https://raw.githubusercontent.com/difiore/ada-datasets/main/data-wrangling.csv"
+df<-read_csv(f, col_names = TRUE)
+names(df)
+head(df)
+```
+
+Tasks:
+
+1.  Create a new variable named **BSD** (body size dimorphism) which is the ratio of average male to female body mass.
+2.  Create a new variable named **sex_ratio**, which is the ratio of the number of adult females to adult males in a typical group.
+3.  Create a new variable named **DI** (for “defensibility index”), which is the ratio of day range length to the diameter of the home range.
+
+```{r}
+ BSD<-df$Body_mass_male_mean/df$Body_mass_female_mean
+ sex_ratio<-df$AdultFemale/df$AdultMales
+ diameter=2*sqrt(df$HomeRange_km2/pi)
+ DI<-df$DayLength_km/diameter
+ DI
+```
+
+4.  Plot the relationship between day range length (y axis) and time spent moving (x axis), for these primate species *overall* and *by family* (i.e., a different plot for each family, e.g., by using faceting: `+ facet_wrap()`).
+
+```{r}
+ ggplot(df, aes(x=df$Move, y=df$DayLength_km))+
+   geom_point(color="orange", na.rm = TRUE)+
+   xlab("Time spent Moving")+
+   ylab("Day range length")
+```
+
+4.  Do species that spend more time moving travel farther overall?
+
+    No, there is no linear relationship between time spent moving and the distance of the day range. Only few species showed long distance travel spending reasonable time.
+
+```{r}
+ggplot(df, aes(x=df$Move, y=df$DayLength_km))+
+  geom_point(color="orange", na.rm=TRUE)+
+  facet_wrap(~ df$Family)+
+  xlab("Time spent Moving")+
+  ylab("Day range length")
+```
+
+4.  How about within any particular primate family?
+
+    Only Cercopithecidae and Hominidae family members travel farther spending more time moving. Especially, species from Cercopithecidae family do go far. Other species seems do not follow that trend, their walking ranges are not long. Within Atelidae family, few species even though, spend a lot of time moving around do not travel far;
+
+    Should you transform either of these variables?
+
+    I have tried log transform, to see if there linear trend.
+
+    From plot we can see that by the increase in the time, the day range length increase, showing linear trend.
+
+```{r}
+ggplot(df, aes(x=log(df$Move), y=log(df$DayLength_km)))+
+         geom_point(color="orange", na.rm=TRUE)+
+#         facet_wrap(~ df$Family)+
+          xlab("Time spent Moving")+
+         ylab("Day range length")
+
+```
+
+5.  Plot the relationship between day range length (y axis) and group size (x axis), *overall* and *by family*.
+
+```{r}
+ ggplot(df, aes(x=df$MeanGroupSize, y=df$DayLength_km))+
+   geom_point(color="orange", na.rm = TRUE)+
+   xlab("Mean Group Size")+
+   ylab("Day range length")
+```
+
+5.  Do species that live in larger groups travel farther overall?
+
+```         
+Yes, seems like that.
+```
+
+```{r}
+ ggplot(df, aes(x=df$MeanGroupSize, y=df$DayLength_km))+
+   geom_point(color="orange", na.rm = TRUE)+
+  facet_wrap(~ df$Family)+
+   xlab("Mean Group Size")+
+   ylab("Day range length")
+```
+
+5.  How about within any particular primate family?
+
+    Yes.
+
+6.  Should you transform either of these variables?
+
+```{r}
+ ggplot(df, aes(x=log(df$MeanGroupSize), y=log(df$DayLength_km)))+
+   geom_point(color="orange", na.rm = TRUE)+
+   xlab("Log of Mean Group Size")+
+   ylab("Log of Day range length")
+```
+
+yes, we can see linear trend.
+
+6.  Plot the relationship between canine size dimorphism (y axis) and body size dimorphism (x axis) overall and by family. Do taxa with greater size dimorphism also show greater canine dimorphism?
+
+```{r}
+body_dimor<-df$Body_mass_male_mean/df$Body_mass_female_mean
+ggplot(df, aes(x=body_dimor, y=df$Canine_Dimorphism))+
+  geom_point(color="orange", na.rm = TRUE)+
+  xlab("Body mass dimorphism")+
+  ylab("Canine size dimorphism")+
+  geom_smooth(method = "lm", fullrange = FALSE, na.rm = TRUE)
+##wanted to draw regression line
+```
+ 
+```{r}
+ggplot(df, aes(x=body_dimor, y=df$Canine_Dimorphism))+
+   geom_point(na.rm = TRUE)+
+  facet_wrap(~ df$Family, ncol = 4)+
+  xlab("Body mass dimorphism")+
+  ylab("Canine size dimorphism")
+
+##i wanted to do in different collors but its not working
+```
+
+ Do taxa with greater size dimorphism also show greater canine dimorphism?
+  Only Cercopithecidae show linear relationship with body size dimorphism and canine size. While Hominidae do not follow the trend, canine size seems fixed regardless of the body size.
+  
+  Another plot below visually beautiful
+
+```{r}
+ggplot(df, aes(x=body_dimor, y = df$Canine_Dimorphism,
+            color = factor(df$Family)))+
+    geom_point(na.rm = TRUE)+
+  xlab("Body mass dimorphism")+
+  ylab("Canine size dimorphism")+
+  theme(legend.position = "bottom", legend.title = element_blank())
+ 
+```
+  
+
+7.  Create a new variable named diet_strategy that is “frugivore” if fruits make up \>50% of the diet, “folivore” if leaves make up \>50% of the diet, and “omnivore” if diet data are available, but neither of these is true (i.e., these values are not NA).
+
+
+
+```{r}
+frugivore<-df[df$Fruit>50,]
+folivore<-df[df$Leaves>50,]
+omnivore<-df[df$Fruit<=50 & df$Leaves<=50,]
+
+
+df$diet_strategy <- case_when(df$Fruit > 50 ~ "frugivore", df$Leaves >= 50 ~ "folivore", (df$Fruit <= 50 & df$Leaves <= 50) ~ "omnivore")
+```
+
+Then, do boxplots of group size for species with different dietary strategies.
+
+```{r}
+boxplot(df$MeanGroupSize ~ df$diet_strategy)
+stripchart(df$MeanGroupSize ~ df$diet_strategy, method = "jitter", col = "blue", vertical = TRUE, add = TRUE)
+
+
+```
+
+Do frugivores live in larger groups than folivores?
+Not significantly. Omnivores live in larger groups.
+
+8.In one line of code, using {dplyr} verbs and the forward pipe (\|\> or %\>%) operator, do the following: 
+
+Add a variable, Binomial to the data frame d, which is a concatenation of the Genus and Species variables… Trim the data frame to only include the variables Binomial, Family, Brain_size_species_mean, and Body_mass_male_mean… Group these variables by Family… Calculate the average value for Brain_size_species_mean and Body_mass_male_mean per Family (remember, you may need to specify na.rm = TRUE)… And arrange by increasing average brain size
+
+```{r}
+df %>% mutate(df, Binomial = paste(Genus, Species, sep = " ")) %>%
+select(Binomial,Family,Brain_Size_Species_Mean,Body_mass_male_mean) %>% group_by(Family) %>% summarize(n_cases = n(), AvB = mean(df$Brain_Size_Species_Mean, na.rm = TRUE), AvM = mean(df$Body_mass_male_mean, na.rm = TRUE)) %>% arrange(AvB)
+```
+
+I dont know why my code not counting the average mean, I mean their everage is same for all the group! It keep calculating the overal mean, not per Family. That one I could not fix.
+
+
+## My work
+
+Using ggplot generated plot using my dataset
+``` {r}
+library(tidyverse)
+
+f<-"/Users/madinaseidualy/Desktop/Sarayshiq/Relatedness/ibd_release_SRQ_v9.csv"
+IBD<-read_csv(f, col_names = TRUE)
+names(IBD)
+
+ggplot(IBD, aes(x=IBD$`sum_IBD>12`, y=IBD$`n_IBD>12`))+
+  geom_point(color="orange", na.rm = TRUE)+
+  geom_text(aes(label=paste(IBD$iid1, IBD$iid2, sep="-")), vjust=-1, size=3) +
+  xlim(min(IBD$`sum_IBD>12`) - 15, max(IBD$`sum_IBD>12`) + 15) + 
+  xlab("Sum IBD>12") +
+  ylab("Number IBD>12")+
+  theme(plot.margin = margin(1, 1, 1, 1, "cm"))
+
+ggplot(IBD, aes(x=IBD$`sum_IBD>16`, y=IBD$`n_IBD>16`))+
+  geom_point(color="orange", na.rm = TRUE)+
+  geom_text(aes(label=paste(IBD$iid1, IBD$iid2, sep="-")), vjust=-1, size=3) +
+  xlim(min(IBD$`sum_IBD>16`) - 15, max(IBD$`sum_IBD>16`) + 15) + 
+  xlab("Sum IBD>16") +
+  ylab("Number IBD>16")+
+  theme(plot.margin = margin(1, 1, 1, 1, "cm"))
+
+
+library(ggplot2)
+
+f<-"/Users/madinaseidualy/Desktop/Sarayshiq/f3_stat/f3_SRQ_org.csv"
+f3<-read_csv(f, col_names = TRUE)
+# Sort data by F3 values
+colnames(f3)
+d <- f3[order(f3$f_3),][1:30, ]
+
+# Create the plot
+ggplot(d, aes(x = f_3, y = reorder(Source2, f_3))) +
+  geom_point() +
+  geom_errorbarh(aes(xmin = f_3 - std.err, xmax = f_3 + std.err), height = 0.2) +
+  labs(x = "F3(SRQ, Test; Mbuti)", y = "") +
+  theme_minimal()
+```
